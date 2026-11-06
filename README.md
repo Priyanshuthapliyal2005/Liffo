@@ -36,6 +36,27 @@ continuous batching, scheduler, or GPU kernels.
 | Operations | Server-specific logs | Health, readiness, Prometheus metrics, and OTel spans |
 | Benchmarking | Ad hoc scripts | Privacy-safe JSONL plus TTFT, latency, and throughput reports |
 
+## Liffo compared with inference engines
+
+Liffo, `llama.cpp`, and DeepInfer solve different layers of the inference
+stack. Liffo is not another model runtime: it coordinates workers that already
+expose an OpenAI-compatible API.
+
+| Dimension | Liffo | [llama.cpp](https://github.com/ggml-org/llama.cpp) | [DeepInfer](https://github.com/deepseek-ai/DeepInfer) |
+|---|---|---|---|
+| Primary role | Reliability, routing, lifecycle, observability, and benchmarking control plane | GGUF model runtime and local inference server | High-performance inference framework for DeepSeek models |
+| Runs model kernels | No—delegates generation to workers | Yes | Yes |
+| Current serving surface | OpenAI-compatible multi-worker gateway | OpenAI-compatible worker/server | Public release demonstrates offline inference; a complete service requires additional components |
+| Scheduling focus | Cross-worker admission, placement, capacity, and safe recovery | In-engine request and token execution | Asynchronous batch scheduling, parallelism, and optimized device execution |
+| Hardware relationship | Inherits worker support; records actual CPU/GPU conditions | Provides the reference local CPU/GPU backend for Liffo | Current README lists NVIDIA SM100 and Huawei Ascend 950 |
+| Multi-worker load balancing | Included | Outside Liffo-style control-plane scope | Listed as required but not included in the current public release |
+| Best fit | Operating and measuring local or private OpenAI-compatible worker fleets | Running broad GGUF models locally | Running supported DeepSeek models on its targeted accelerator platforms |
+
+The projects are complementary at different boundaries. Liffo currently uses
+`llama-server` as its reference worker. It does not claim direct DeepInfer
+integration because DeepInfer's current public release does not expose the
+worker API Liffo expects.
+
 ## Capabilities
 
 | Area | Included in this release candidate |
