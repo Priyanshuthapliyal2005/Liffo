@@ -1,0 +1,18 @@
+listen: 127.0.0.1:8088
+mode: static
+route_method: least_inflight
+max_inflight: 4
+max_admit_waiters: 64
+admit_timeout_ms: 3000
+retry_enabled: true
+model: local
+timeout_sec: 120
+workers:
+  - label: llama-local
+    url: http://127.0.0.1:8080
+    capacity: 1
+
+# To let Liffo start and stop llama-server, configure lifecycle as shown in
+# configs/gateway-managed.example.yaml and set LIFFO_ADMIN_TOKEN.
+lifecycle:
+  enabled: false

@@ -1,0 +1,16 @@
+/bin/
+/models/
+/results/raw/*
+/results/logs/*
+/reports/*
+!/results/raw/.gitkeep
+!/results/logs/.gitkeep
+!/reports/.gitkeep
+*.exe
+*.dll
+*.so
+*.dylib
+*.gguf
+.DS_Store
+.env
+.env.*

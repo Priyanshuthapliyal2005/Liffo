@@ -1,0 +1,30 @@
+listen: 127.0.0.1:8088
+mode: static
+route_method: least_inflight
+max_inflight: 2
+max_admit_waiters: 64
+admit_timeout_ms: 3000
+retry_enabled: true
+model: qwen-small
+timeout_sec: 120
+workers:
+  - label: llama-managed
+    url: http://127.0.0.1:8080
+    capacity: 1
+lifecycle:
+  enabled: true
+  bin: /absolute/path/to/llama-server
+  work_dir: /absolute/path/to/llama.cpp/bin
+  model_root: /absolute/path/to/models
+  host: 127.0.0.1
+  port: 8080
+  ngl: -1
+  ctx_size: 2048
+  ready_timeout_sec: 90
+  load_timeout_sec: 120
+  evict_timeout_sec: 20
+  drain_timeout_sec: 30
+  log_path: results/logs/llama-server.log
+  bootstrap_model: qwen-small
+  models:
+    qwen-small: qwen-small.gguf

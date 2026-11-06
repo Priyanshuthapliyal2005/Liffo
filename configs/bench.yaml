@@ -1,0 +1,19 @@
+base_url: http://127.0.0.1:8088
+endpoint_path: /v1/chat/completions
+model: local
+mode: cpu
+stream: true
+iterations: 3
+warmup: 1
+max_tokens: 32
+temperature: 0
+timeout_sec: 120
+concurrency: 1
+sample_interval_ms: 200
+store_prompt_text: false
+store_completion_text: false
+prompts:
+  - id: greeting
+    messages:
+      - role: user
+        content: Say hello in five words.
