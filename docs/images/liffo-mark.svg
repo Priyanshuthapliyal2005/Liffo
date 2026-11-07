@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160" role="img" aria-labelledby="title desc">
+  <title id="title">Liffo mesh mark</title>
+  <desc id="desc">A central routing node connected to six inference worker nodes.</desc>
+  <defs>
+    <linearGradient id="core" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#60a5fa"/>
+      <stop offset="1" stop-color="#2563eb"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke="#93c5fd" stroke-width="5" stroke-linecap="round">
+    <path d="M80 80 80 24M80 80 128 50M80 80 128 110M80 80 80 136M80 80 32 110M80 80 32 50"/>
+  </g>
+  <g fill="#dbeafe" stroke="#3b82f6" stroke-width="4">
+    <circle cx="80" cy="22" r="12"/>
+    <circle cx="130" cy="49" r="12"/>
+    <circle cx="130" cy="111" r="12"/>
+    <circle cx="80" cy="138" r="12"/>
+    <circle cx="30" cy="111" r="12"/>
+    <circle cx="30" cy="49" r="12"/>
+  </g>
+  <circle cx="80" cy="80" r="24" fill="url(#core)" stroke="#1d4ed8" stroke-width="5"/>
+  <path d="m68 80 8 8 17-19" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

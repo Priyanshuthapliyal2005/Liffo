@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="docs/images/liffo-mark.svg" width="112" alt="Liffo mesh logo">
+
 # Liffo
 
 **Reliability, routing, observability, and benchmarks for local LLM inference.**
@@ -7,6 +9,8 @@
 ![Status](https://img.shields.io/badge/status-release%20candidate-f59e0b)
 ![Go](https://img.shields.io/badge/Go-1.27.3-00ADD8?logo=go&logoColor=white)
 ![License](https://img.shields.io/badge/license-Apache--2.0-2563eb)
+
+[Getting started](#getting-started) · [Benchmarks](#reference-benchmarks) · [Documentation](#documentation) · [Contributing](CONTRIBUTING.md)
 
 </div>
 
@@ -142,6 +146,7 @@ See [validation evidence](docs/VALIDATION.md) and the [release audit](docs/RELEA
 - [Architecture and request invariants](docs/ARCHITECTURE.md)
 - [Reference benchmark methodology](docs/BENCHMARKS.md)
 - [Real CPU/GPU inference guide](docs/REAL_INFERENCE.md)
+- [Runnable configurations](examples/README.md)
 - [Private/public change workflow](docs/PORTING.md)
 - [Security policy](SECURITY.md)
 - [Third-party dependency inventory](THIRD_PARTY_NOTICES.md)

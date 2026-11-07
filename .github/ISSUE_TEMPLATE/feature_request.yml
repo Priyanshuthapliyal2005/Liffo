@@ -1,0 +1,33 @@
+name: Feature request
+description: Propose a focused improvement to Liffo
+title: "[feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What inference-operation problem should Liffo solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Describe the smallest useful behavior and its user-facing interface.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives and tradeoffs
+      description: What alternatives did you consider, and what could this complicate?
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope check
+      options:
+        - label: This belongs in the gateway/control-plane layer rather than the inference engine.
+          required: true
+        - label: I have not included private benchmark data or credentials.
+          required: true

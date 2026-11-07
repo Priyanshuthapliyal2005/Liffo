@@ -7,13 +7,41 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/Priyanshuthapliyal2005/Liffo/internal/adapt"
 	"github.com/Priyanshuthapliyal2005/Liffo/internal/route"
+	"gopkg.in/yaml.v3"
 )
+
+func TestExampleGatewayConfigs(t *testing.T) {
+	for _, name := range []string{"two-workers.yaml", "multi-slo.yaml"} {
+		t.Run(name, func(t *testing.T) {
+			raw, err := os.ReadFile(filepath.Join("..", "..", "examples", name))
+			if err != nil {
+				t.Fatal(err)
+			}
+			var file gatewayFile
+			if err := yaml.Unmarshal(raw, &file); err != nil {
+				t.Fatal(err)
+			}
+			config, cleanup, err := buildGatewayConfig(file)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if cleanup != nil {
+				defer cleanup()
+			}
+			if len(config.Gateway.Workers) != 2 {
+				t.Fatalf("workers=%d want 2", len(config.Gateway.Workers))
+			}
+		})
+	}
+}
 
 func TestGatewayConfigAndStreamingSmoke(t *testing.T) {
 	worker := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

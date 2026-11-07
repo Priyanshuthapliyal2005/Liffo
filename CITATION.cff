@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If Liffo supports your research or evaluation, please cite this software."
+title: "Liffo: Reliability and observability for local LLM inference"
+type: software
+authors:
+  - family-names: Thapliyal
+    given-names: Priyanshu
+repository-code: "https://github.com/Priyanshuthapliyal2005/Liffo"
+url: "https://github.com/Priyanshuthapliyal2005/Liffo"
+version: 0.1.0-rc1
+date-released: 2026-11-07
+license: Apache-2.0
+keywords:
+  - llm-inference
+  - llama.cpp
+  - inference-gateway
+  - observability
+  - benchmarking
