@@ -36,6 +36,22 @@ continuous batching, scheduler, or GPU kernels.
 | Operations | Server-specific logs | Health, readiness, Prometheus metrics, and OTel spans |
 | Benchmarking | Ad hoc scripts | Privacy-safe JSONL plus TTFT, latency, and throughput reports |
 
+## Reference benchmark
+
+CPU and GPU matrices ran sequentially on the same Linux x86_64 allocation with
+an AMD EPYC 7R13, NVIDIA L4, llama.cpp b12177, and Qwen2.5-0.5B-Instruct
+Q4_K_M. Each concurrency cell contains 32 measured requests; all 256 requests
+completed successfully with zero SSE parse errors.
+
+| Median per-request decode throughput ↑ | Median time to first token ↓ |
+|---|---|
+| ![Grouped CPU and NVIDIA L4 median decode throughput bars at concurrency 1, 2, 4, and 8](docs/images/decode-throughput.svg) | ![Grouped CPU and NVIDIA L4 median TTFT bars at concurrency 1, 2, 4, and 8](docs/images/ttft-by-concurrency.svg) |
+
+The GPU run records full `25/25` layer offload. These are reference results for
+one small model and one hardware allocation—not universal performance claims.
+See the [hardware manifest, complete values, metric definitions, and
+reproduction guidance](docs/BENCHMARKS.md).
+
 ## Liffo compared with inference engines
 
 Liffo, `llama.cpp`, and DeepInfer solve different layers of the inference
@@ -185,22 +201,6 @@ In another terminal:
 Raw request rows are written under `results/raw/`; generated Markdown and JSON
 reports are written under `reports/`. Both directories ignore generated output
 by default.
-
-## Reference benchmark
-
-CPU and GPU matrices ran sequentially on the same Linux x86_64 allocation with
-an AMD EPYC 7R13, NVIDIA L4, llama.cpp b12177, and Qwen2.5-0.5B-Instruct
-Q4_K_M. Each concurrency cell contains 32 measured requests; all 256 requests
-completed successfully with zero SSE parse errors.
-
-| Median per-request decode throughput ↑ | Median time to first token ↓ |
-|---|---|
-| ![Grouped CPU and NVIDIA L4 median decode throughput bars at concurrency 1, 2, 4, and 8](docs/images/decode-throughput.svg) | ![Grouped CPU and NVIDIA L4 median TTFT bars at concurrency 1, 2, 4, and 8](docs/images/ttft-by-concurrency.svg) |
-
-The GPU run records full `25/25` layer offload. These are reference results for
-one small model and one hardware allocation—not universal performance claims.
-See the [hardware manifest, complete values, metric definitions, and
-reproduction guidance](docs/BENCHMARKS.md).
 
 ## GPU inference
 
