@@ -41,18 +41,17 @@ replacing the model runtime.
 
 ## Where Liffo fits
 
-Liffo operates above inference engines; it does not execute model kernels.
+Liffo operates above the inference runtime. The boundary is intentionally
+simple:
 
-| | Liffo | [llama.cpp](https://github.com/ggml-org/llama.cpp) | [DeepInfer](https://github.com/deepseek-ai/DeepInfer) |
-|---|---|---|---|
-| Primary role | Multi-worker control plane | GGUF model runtime and server | High-performance DeepSeek inference framework |
-| Scheduling boundary | Cross-worker admission, placement, and recovery | In-engine request and token execution | Device execution, parallelism, and asynchronous batch scheduling |
-| Serving status | OpenAI-compatible gateway | OpenAI-compatible reference worker | Current public release demonstrates offline inference; complete serving needs additional components |
-| Best fit | Operating and measuring private worker fleets | Running broad GGUF models locally | Supported DeepSeek models on targeted accelerators |
+| Layer | Responsibility |
+|---|---|
+| Client or deployment edge | Application behavior, TLS, and user authentication |
+| Liffo control plane | Admission, worker selection, recovery, lifecycle, telemetry, and benchmarks |
+| Inference worker | Model loading, device execution, token generation, and the OpenAI-compatible worker API |
 
-Liffo currently integrates with `llama-server`. It does not claim direct
-DeepInfer integration because DeepInfer's current public release does not
-expose the worker API Liffo expects.
+`llama-server` is the reference worker, but Liffo's routing and observability
+layers depend on the API contract rather than a specific model architecture.
 
 ## Supported environments
 
