@@ -1,0 +1,34 @@
+listen: 127.0.0.1:8088
+mode: static
+route_method: multi_slo
+max_inflight: 4
+max_admit_waiters: 64
+admit_timeout_ms: 3000
+retry_enabled: true
+model: local
+timeout_sec: 120
+multi_slo:
+  weight_cost: 0.20
+  weight_latency: 0.30
+  weight_load: 0.20
+  weight_slo: 0.20
+  weight_quality: 0.10
+  min_quality: 0.70
+  max_cost_per_req: 0.01
+  slo_target_ms: 250
+  latency_ema_alpha: 0.30
+workers:
+  - label: fast-worker
+    url: http://127.0.0.1:8080
+    cost_per_req: 0.008
+    latency_prior_ms: 100
+    quality_tier: 0.85
+    capacity: 2
+  - label: efficient-worker
+    url: http://127.0.0.1:8081
+    cost_per_req: 0.003
+    latency_prior_ms: 180
+    quality_tier: 0.80
+    capacity: 1
+lifecycle:
+  enabled: false

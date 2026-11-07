@@ -1,0 +1,58 @@
+name: Bug report
+description: Report a reproducible Liffo defect
+title: "[bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for helping improve Liffo. Never attach credentials, prompts, completions, models, or private traces.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened, and what did you expect instead?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction
+      description: Provide the smallest privacy-safe configuration and command sequence that reproduces the issue.
+      placeholder: |
+        1. Start worker with ...
+        2. Start Liffo with ...
+        3. Send request ...
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Windows
+        - Linux
+        - macOS
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Liffo and Go versions
+      placeholder: "Liffo 0.1.0-rc1; go1.27.3"
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Privacy-safe evidence
+      description: Include sanitized logs, status codes, and hardware details. Remove prompt/completion bodies and tokens.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues for this problem.
+          required: true
+        - label: I removed credentials, private paths, prompts, completions, and model data.
+          required: true

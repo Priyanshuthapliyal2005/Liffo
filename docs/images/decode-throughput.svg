@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="480" viewBox="0 0 720 480" role="img" aria-labelledby="title desc">
+  <title id="title">Median per-request decode throughput by concurrency</title>
+  <desc id="desc">Grouped bar chart comparing CPU and NVIDIA L4 GPU tokens per second at concurrency 1, 2, 4, and 8. GPU throughput is higher at every tested concurrency.</desc>
+  <rect width="720" height="480" rx="18" fill="#ffffff"/>
+  <text x="40" y="42" fill="#0f172a" font-family="system-ui, sans-serif" font-size="22" font-weight="700">Median decode throughput</text>
+  <text x="40" y="69" fill="#475569" font-family="system-ui, sans-serif" font-size="13">Per-request output tokens/second · higher is better</text>
+
+  <g stroke="#e2e8f0" stroke-width="1">
+    <line x1="70" y1="100" x2="690" y2="100"/>
+    <line x1="70" y1="167.5" x2="690" y2="167.5"/>
+    <line x1="70" y1="235" x2="690" y2="235"/>
+    <line x1="70" y1="302.5" x2="690" y2="302.5"/>
+    <line x1="70" y1="370" x2="690" y2="370"/>
+  </g>
+  <g fill="#64748b" font-family="system-ui, sans-serif" font-size="12" text-anchor="end">
+    <text x="60" y="104">400</text>
+    <text x="60" y="171.5">300</text>
+    <text x="60" y="239">200</text>
+    <text x="60" y="306.5">100</text>
+    <text x="60" y="374">0</text>
+  </g>
+
+  <g fill="#64748b">
+    <rect x="110" y="332.8" width="34" height="37.2" rx="4"/>
+    <rect x="265" y="347.3" width="34" height="22.7" rx="4"/>
+    <rect x="420" y="358.9" width="34" height="11.1" rx="4"/>
+    <rect x="575" y="366.4" width="34" height="3.6" rx="2"/>
+  </g>
+  <g fill="#2563eb">
+    <rect x="152" y="126.8" width="34" height="243.2" rx="4"/>
+    <rect x="307" y="155.7" width="34" height="214.3" rx="4"/>
+    <rect x="462" y="229.9" width="34" height="140.1" rx="4"/>
+    <rect x="617" y="285.8" width="34" height="84.2" rx="4"/>
+  </g>
+
+  <g fill="#334155" font-family="system-ui, sans-serif" font-size="11" text-anchor="middle">
+    <text x="127" y="326">55.1</text>
+    <text x="282" y="340">33.7</text>
+    <text x="437" y="352">16.5</text>
+    <text x="592" y="359">5.4</text>
+    <text x="169" y="120">360.3</text>
+    <text x="324" y="149">317.5</text>
+    <text x="479" y="223">207.5</text>
+    <text x="634" y="279">124.8</text>
+  </g>
+  <g fill="#0f172a" font-family="system-ui, sans-serif" font-size="13" text-anchor="middle">
+    <text x="148" y="398">c=1</text>
+    <text x="303" y="398">c=2</text>
+    <text x="458" y="398">c=4</text>
+    <text x="613" y="398">c=8</text>
+  </g>
+  <text x="380" y="428" fill="#475569" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">Concurrent requests</text>
+
+  <rect x="226" y="445" width="13" height="13" rx="3" fill="#64748b"/>
+  <text x="246" y="456" fill="#334155" font-family="system-ui, sans-serif" font-size="12">CPU (-ngl 0)</text>
+  <rect x="372" y="445" width="13" height="13" rx="3" fill="#2563eb"/>
+  <text x="392" y="456" fill="#334155" font-family="system-ui, sans-serif" font-size="12">NVIDIA L4</text>
+</svg>
