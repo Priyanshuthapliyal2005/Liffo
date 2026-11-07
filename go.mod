@@ -1,6 +1,6 @@
 module github.com/Priyanshuthapliyal2005/Liffo
 
-go 1.25.0
+go 1.26.0
 
 toolchain go1.27.3
 
@@ -11,7 +11,7 @@ require (
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.45.0
 	go.opentelemetry.io/otel/sdk v1.45.0
 	go.opentelemetry.io/otel/trace v1.45.0
-	golang.org/x/sys v0.47.0
+	golang.org/x/sys v0.49.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
