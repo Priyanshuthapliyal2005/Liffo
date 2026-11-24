@@ -74,7 +74,10 @@ done
 ```
 
 `--mode` labels the run and controls GPU sampling. The worker launch controls
-offload. Pass `--server-pid` to sample the worker's memory. The current CLI prints a rounded
-measured elapsed time. Keep stdout and JSONL together when reporting new runs.
+offload. Pass `--server-pid` to sample the worker's memory. The report command
+reads request rows and does not have the cell's elapsed time. To estimate the
+wall output rate for a new run, sum successful `tokens_out` from JSONL and
+divide by the rounded `wall` value from `bench` stdout in seconds. The curated
+reference uses the historical elapsed time at its original precision.
 The historical InferMesh client also sampled resources across the measured
 phase. Resource maxima from the current Liffo client may differ in coverage.
