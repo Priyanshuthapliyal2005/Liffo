@@ -19,7 +19,7 @@ All notable changes to Liffo are documented here. The format follows
 - OpenAI-compatible streaming gateway
 - Bounded admission and overload shedding
 - Load-, affinity-, capacity-, estimated-work-, and multi-SLO routing
-- Safe pre-output streaming recovery
+- HTTP worker-health recovery across requests and stage-aware retry in the internal executor
 - Managed llama.cpp lifecycle with drain-before-evict semantics
 - Prometheus and OpenTelemetry observability
 - Privacy-safe benchmark client and reports

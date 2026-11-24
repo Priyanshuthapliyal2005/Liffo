@@ -9,8 +9,7 @@ import (
 	"github.com/Priyanshuthapliyal2005/Liffo/internal/modellife"
 )
 
-// SharedPathID is the identity string recorded on every RequestSession.
-// Both Gateway.Handle and HTTPServer.handleChatCompletions must enter via BeginRequest.
+// SharedPathID identifies the shared admission mechanism used by both entry points.
 const SharedPathID = "gateway.BeginRequest"
 
 // SessionError is a structured admission or lifecycle rejection from BeginRequest.
@@ -98,8 +97,7 @@ func (s *RequestSession) LifecycleHold() bool {
 	return s != nil && (s.Lease != nil || s.CoordLease != nil)
 }
 
-// BeginRequest is the single shared entry for lifecycle + policy refresh + admission.
-// Handle and HTTP both call this — do not re-implement admit/lease elsewhere.
+// BeginRequest admits an in-process request and acquires its lifecycle lease, if configured.
 func (g *Gateway) BeginRequest(ctx context.Context) (*RequestSession, *SessionError) {
 	return g.beginRequest(ctx, -1, "")
 }
@@ -109,10 +107,8 @@ func (g *Gateway) BeginRequestFor(ctx context.Context, workerID int, model strin
 	return g.beginRequest(ctx, workerID, model)
 }
 
-// BeginAdmission takes ONLY an admission slot (no model-lifecycle lease).
-// It exists so a caller that must route before it knows the worker can still
-// admit first: reserving a worker before admission inflated the very
-// least-inflight signal the router reads. Pair with AttachLifecycle.
+// BeginAdmission takes an admission slot. The HTTP path then reserves a worker
+// and calls AttachLifecycle. This keeps queued requests out of routing load counts.
 func (g *Gateway) BeginAdmission(ctx context.Context) (*RequestSession, *SessionError) {
 	if ctx == nil {
 		ctx = context.Background()
@@ -243,12 +239,8 @@ func (g *Gateway) beginRequest(ctx context.Context, workerID int, model string) 
 // elapses, or ctx is done. On success the in-flight counter has been
 // incremented and the caller owns one slot.
 //
-// Waiters block on g.cond rather than polling. Two helper goroutines per
-// *waiting* request broadcast on ctx-done and on the deadline so a blocked
-// waiter always wakes; a request that is admitted without waiting starts no
-// goroutines at all. The number of concurrent waiters is bounded by
-// MaxAdmitWaiters: past that, load is shed immediately with admit_queue_full,
-// which is what keeps goroutine and socket growth flat under overload.
+// Waiters use g.cond. Helpers wake them on cancellation or deadline expiry.
+// Once the admission queue is full, new waiters receive admit_queue_full.
 func (g *Gateway) awaitAdmission(ctx context.Context, wait0 time.Time) *SessionError {
 	pol := g.cfg.Initial
 	if g.cfg.Mode == ModeAdaptive {
@@ -383,7 +375,7 @@ func (g *Gateway) sessionLifeErr(err error) *SessionError {
 	}
 }
 
-// SharedPathHits returns how many times BeginRequest was entered (proof counter).
+// SharedPathHits counts calls that enter shared admission.
 func (g *Gateway) SharedPathHits() int64 { return g.sharedPathHits.Load() }
 
 // RecordSample feeds the adaptive controller after a completed (non-rejected) request.

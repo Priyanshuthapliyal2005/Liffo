@@ -26,11 +26,11 @@ before exposing it beyond loopback or a trusted network.
 
 | Control | Protection |
 |---|---|
-| Bounded admission | Limits active requests and queued waiters under overload |
+| Bounded admission | Limits active requests and queued admission waiters; edge limits are still required for connections and HTTP handlers |
 | Admin token | Protects lifecycle mutation endpoints through `LIFFO_ADMIN_TOKEN` |
 | Logical model allowlist | Prevents arbitrary model-path selection by API clients |
 | Root confinement | Resolves model paths beneath `model_root`, including symlinks |
-| Pre-output-only retry | Avoids duplicating visible streamed output |
+| Single HTTP completion attempt | The gateway forwards the upstream response and updates worker health for subsequent requests |
 | Privacy-safe results | Omits prompt and completion bodies from generated JSONL |
 
 ## Deployment checklist

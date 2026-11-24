@@ -15,7 +15,7 @@
 </div>
 
 Liffo is a local-first control plane for OpenAI-compatible inference workers.
-It adds bounded admission, load-aware routing, safe streaming recovery, model
+It adds bounded admission, load-aware routing, worker health tracking, model
 lifecycle coordination, telemetry, and reproducible benchmarking without
 replacing the model runtime.
 
@@ -32,8 +32,8 @@ replacing the model runtime.
 - Bounded in-flight admission, bounded waiters, timeout, and overload shedding
 - Round-robin, least-inflight, prefix-affinity, hybrid, capacity-aware,
   estimated-workload, and multi-SLO routing
-- Atomic worker selection and capacity reservation
-- Retry only before user-visible streamed output
+- Atomic worker selection and in-flight accounting
+- One upstream completion attempt per HTTP request, with worker health updates for subsequent requests
 - Load → ready → drain → evict process lifecycle
 - Prometheus metrics, OpenTelemetry spans, health, readiness, and worker status
 - TTFT, latency, throughput, RAM, VRAM, and GPU-utilization benchmarking
@@ -98,19 +98,22 @@ Start a CPU worker:
 llama-server -m /path/model.gguf --host 127.0.0.1 --port 8080 -c 2048 -ngl 0
 ```
 
-Start Liffo and verify the mesh:
+Start Liffo in a second terminal:
 
 ```sh
 ./bin/liffo gateway --config configs/gateway.yaml
-./bin/liffo status --gateway http://127.0.0.1:8088
 ```
 
-Run a privacy-safe benchmark and generate a report:
+In a third terminal, check readiness and run a streaming benchmark through the gateway:
 
 ```sh
-./bin/liffo bench --config configs/bench.yaml --mode cpu --total-requests 10
-./bin/liffo report --raw results/raw --target "actual CPU, RAM, GPU, and OS"
+curl -fsS http://127.0.0.1:8088/ready
+run_dir="$(mktemp -d)"
+./bin/liffo bench --config configs/bench.yaml --mode cpu --total-requests 10 --out "$run_dir"
+./bin/liffo report --raw "$run_dir" --target "gateway smoke run"
 ```
+
+Look for `n=10 errors=0` in the benchmark output.
 
 For managed llama.cpp lifecycle, copy
 `configs/gateway-managed.example.yaml`, replace its paths, and set a long random

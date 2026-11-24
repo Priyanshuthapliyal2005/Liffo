@@ -74,27 +74,30 @@ go build -trimpath -o bin/liffo ./cmd/liffo
 
 ```sh
 ./bin/liffo status --gateway http://127.0.0.1:8088
-curl -fsS http://127.0.0.1:8088/readyz
+curl -fsS http://127.0.0.1:8088/ready
 ```
 
-Do not begin a timed run until both the worker and gateway report ready.
+Wait for `/ready` to return HTTP 200 before measuring.
 
 ### 4. Measure
 
 ```sh
+run_dir="$(mktemp -d)"
 ./bin/liffo bench \
   --config configs/bench.yaml \
   --mode cpu \
   --concurrency 1 \
-  --total-requests 10
+  --total-requests 10 \
+  --out "$run_dir"
 
 ./bin/liffo report \
-  --raw results/raw \
+  --raw "$run_dir" \
   --target "CPU, RAM, GPU, OS, driver, llama.cpp revision, model hash"
 ```
 
-For a GPU run, change `--mode cpu` to `--mode gpu`. Use a fresh output
-directory when changing modes or concurrency so samples cannot be mixed.
+This run targets the gateway. Check for `n=10 errors=0` in the benchmark output.
+For a GPU run, launch the GPU worker shown above and use `--mode gpu`
+to label the samples and enable GPU sampling. Use a fresh output directory for each run.
 
 ### 5. Prove GPU placement
 
@@ -126,7 +129,7 @@ On Windows PowerShell, use:
 Get-Process llama-server,liffo -ErrorAction SilentlyContinue
 ```
 
-## Path B — managed lifecycle
+## Managed worker
 
 Managed mode lets Liffo start, health-check, drain, and stop a local
 `llama-server` process.
