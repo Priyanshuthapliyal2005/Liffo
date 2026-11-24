@@ -9,7 +9,7 @@ and connection limits for external traffic. See the [deployment policy](SECURITY
 
 ## Quickstart
 
-Use Go 1.27.3, `llama-server`, and a GGUF model. In the first terminal, start a
+Use Go 1.27.4, `llama-server`, and a GGUF model. In the first terminal, start a
 CPU worker:
 
 ```sh

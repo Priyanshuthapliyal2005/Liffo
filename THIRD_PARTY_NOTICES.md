@@ -13,11 +13,11 @@
 |---|---:|---|---|
 | `github.com/prometheus/client_golang` | v1.24.1 | Apache-2.0 | Metrics exposition |
 | `github.com/prometheus/common` | v0.70.1 | Apache-2.0 | Prometheus model and helpers |
-| `go.opentelemetry.io/otel` | v1.45.0 | Apache-2.0 | Tracing API |
-| `go.opentelemetry.io/otel/exporters/stdout/stdouttrace` | v1.45.0 | Apache-2.0 | Local trace export |
-| `go.opentelemetry.io/otel/sdk` | v1.45.0 | Apache-2.0 | Tracing SDK |
-| `go.opentelemetry.io/otel/trace` | v1.45.0 | Apache-2.0 | Trace interfaces |
-| `golang.org/x/sys` | v0.47.0 | BSD-3-Clause | Platform system calls |
+| `go.opentelemetry.io/otel` | v1.47.0 | Apache-2.0 | Tracing API |
+| `go.opentelemetry.io/otel/exporters/stdout/stdouttrace` | v1.47.0 | Apache-2.0 | Local trace export |
+| `go.opentelemetry.io/otel/sdk` | v1.47.0 | Apache-2.0 | Tracing SDK |
+| `go.opentelemetry.io/otel/trace` | v1.47.0 | Apache-2.0 | Trace interfaces |
+| `golang.org/x/sys` | v0.48.0 | BSD-3-Clause | Platform system calls |
 | `gopkg.in/yaml.v3` | v3.0.1 | MIT / Apache-2.0 | Configuration parsing |
 
 The Go module graph selects transitive versions from [`go.mod`](go.mod) and

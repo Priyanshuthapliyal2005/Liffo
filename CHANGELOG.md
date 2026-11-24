@@ -22,4 +22,4 @@ All notable changes to Liffo are documented here. The format follows
 
 - Allowlisted logical model IDs confined beneath `model_root`
 - Authenticated lifecycle mutation endpoints
-- Go 1.27.3 and OpenTelemetry 1.45.0. See [validation](docs/VALIDATION.md) for scans.
+- Go 1.27.4 and OpenTelemetry 1.47.0. See [validation](docs/VALIDATION.md) for scans.
