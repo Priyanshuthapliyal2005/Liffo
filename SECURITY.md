@@ -46,12 +46,10 @@ before exposing it beyond loopback or a trusted network.
 
 ## Reporting a vulnerability
 
-Do not publish exploit details, prompts, model data, credentials, or private
-deployment information in a GitHub issue. Report the problem privately to the
-repository owner once a public security-contact channel is listed.
-
-Until that channel exists, the absence of a private reporting address remains
-a release blocker for a formally supported distribution.
+Use a private contact with the maintainer. Keep vulnerability details,
+credentials and deployment data out of public issues. A project-wide private
+reporting channel is pending. Establish and verify it before supported binary
+distribution.
 
 ## Secrets and sensitive artifacts
 

@@ -20,9 +20,9 @@
 | `golang.org/x/sys` | v0.47.0 | BSD-3-Clause | Platform system calls |
 | `gopkg.in/yaml.v3` | v3.0.1 | MIT / Apache-2.0 | Configuration parsing |
 
-Exact transitive versions are locked in [`go.sum`](go.sum). An automated
-`go-licenses report ./...` audit classified selected transitive packages as
-Apache-2.0, BSD-3-Clause, or MIT.
+The Go module graph selects transitive versions from [`go.mod`](go.mod) and
+dependency manifests. [`go.sum`](go.sum) records module checksums. Run
+`go-licenses report ./...` to classify packages at the candidate revision.
 
 ## Distribution requirements
 
