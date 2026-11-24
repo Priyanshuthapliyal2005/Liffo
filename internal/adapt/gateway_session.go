@@ -171,7 +171,6 @@ func (g *Gateway) beginRequest(ctx context.Context, workerID int, model string) 
 	}
 	g.sharedPathHits.Add(1)
 
-	// --- Admission first ---
 	// Admission is taken BEFORE any model-lifecycle lease. Acquiring the lease
 	// first made every queued request pin lifecycle state for the whole
 	// AdmitTimeout, which blocked drain/evict behind backpressure.
@@ -184,7 +183,7 @@ func (g *Gateway) beginRequest(ctx context.Context, workerID int, model string) 
 	qWait := float64(time.Since(wait0).Seconds() * 1000)
 	infNow := int(atomic.LoadInt32(&g.inflight))
 
-	// --- Model lifecycle lease (drain waits for Release) ---
+	// Draining waits for the lease to be released.
 	var lifeLease *modellife.Lease
 	var coordLease *modellife.WorkerLease
 	releaseSlot := func() {

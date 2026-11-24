@@ -563,7 +563,7 @@ func (h *HTTPServer) handleChatCompletions(w http.ResponseWriter, r *http.Reques
 		w.Header().Set("X-Liffo-Model-State", "ready")
 		w.Header().Set("X-Liffo-Lifecycle-Hold", "1")
 	}
-	// --- Separated network vs backend TTFT ---
+	// The health probe runs before inference. RTT/2 estimates the return-path delay.
 	upStart := time.Now()
 	var timing UpstreamTiming
 	rtt, perr := probeNetworkRTT(ctx, h.client, dec.BaseURL)
