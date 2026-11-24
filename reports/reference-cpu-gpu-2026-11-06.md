@@ -1,28 +1,26 @@
-# Liffo CPU/GPU reference benchmark
+# CPU and NVIDIA L4 reference run
 
-- **Date:** 2026-11-06
-- **Requests:** 128 CPU + 128 GPU
-- **Errors:** 0
-- **SSE parse errors:** 0
-- **Workload:** identical prompts and token limits across modes and concurrency cells
+On November 6, 2026 UTC, the InferMesh benchmark client sent streaming requests
+directly to CPU and CUDA `llama-server` on one Camber allocation. There were
+128 measured requests per mode, with zero request and SSE parse errors.
 
-## Environment
+## Environment and workload
 
 | Component | Value |
 |---|---|
-| OS | Linux x86_64 |
-| CPU | AMD EPYC 7R13, 8 logical CPUs |
-| Memory | 30 GiB RAM |
-| GPU | NVIDIA L4, 23,034 MiB; driver 580.178.04 |
-| Runtime | llama.cpp b12177 (`6c01da627`) |
-| CUDA | 12.8 |
-| Model | Qwen2.5-0.5B-Instruct Q4_K_M |
-| Context | 2048 tokens |
-| CPU configuration | 8 threads, 8 server slots, `-ngl 0` |
-| GPU configuration | 8 server slots, full 25/25-layer offload |
+| Host | Linux x86_64, AMD EPYC 7R13, 8 logical CPUs, 30 GiB RAM |
+| GPU | NVIDIA L4, 23,034 MiB, driver 580.178.04 |
+| Runtime | llama.cpp b12177, `6c01da6278ab6c69ed67d9124806b50d2b299ba7`, CUDA 12.8 for GPU |
+| Model | Qwen2.5-0.5B-Instruct Q4_K_M GGUF, file revision `6dd44a1fb35d11b5d1b28902876ce3cc9e882d0e` |
+| Model SHA-256 | `74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db` |
+| CPU worker | Loopback port 18080, 8 threads, 8 slots, 8,192 total context tokens, `-ngl 0` |
+| GPU worker | Loopback port 18081, 8 threads, 8 slots, 8,192 total context tokens, `-ngl 999` |
+| Workload | 32 measured requests per cell. The same three synthetic prompts in each cell. |
+| Warmup | 3, 2, 4 and 8 requests at concurrency 1, 2, 4 and 8, respectively |
 
-CPU and GPU matrices ran sequentially on the same allocation. Each concurrency
-cell contains 32 measured requests.
+The worker runs were sequential. The retained prompt hashes match the
+[reference config](../configs/bench-reference.yaml). See the
+[method and reproduction limits](../docs/BENCHMARKS.md).
 
 ## Overall
 
@@ -44,7 +42,11 @@ cell contains 32 measured requests.
 | GPU | 4 | 11.1 ms | 299.3 ms | 207.5 tok/s | 565.2 tok/s |
 | GPU | 8 | 16.9 ms | 455.5 ms | 124.8 tok/s | 673.3 tok/s |
 
-## GPU placement evidence
+![Median decode throughput by concurrency](../docs/images/decode-throughput.svg)
+
+![Median TTFT by concurrency](../docs/images/ttft-by-concurrency.svg)
+
+## GPU placement
 
 The inference-server log recorded:
 
@@ -56,24 +58,10 @@ CUDA0 KV buffer size = 96.00 MiB
 
 ## Interpretation
 
-The GPU path reduces median TTFT and raises per-request and aggregate output
-throughput in every tested concurrency cell. CPU aggregate output peaks around
-concurrency 2–4, while per-request decode rate and TTFT degrade as concurrency
-increases. The L4 continues gaining aggregate output through concurrency 8,
-with higher per-request contention than at lower concurrency.
+The GPU run had lower median TTFT and higher median decode rate in each cell.
+CPU wall output peaked at concurrency 4 and fell at 8. GPU wall output
+continued to rise at 8 while per-request decode fell. The run covers one model,
+workload and allocation.
 
-These values describe one small model and one hardware allocation. They are not
-universal performance claims and must not be compared directly with results
-from different hardware, model hashes, quantizations, context sizes, or
-llama.cpp revisions.
-
-## Metric definitions
-
-- **TTFT:** time to the first non-empty streamed content delta.
-- **Per-request decode:** output tokens divided by the request's decode window
-  after TTFT.
-- **Wall output rate:** all successful output tokens divided by matrix elapsed
-  time.
-- **RAM/VRAM/GPU utilization:** sampled maxima during measured requests.
-
-See [`docs/BENCHMARKS.md`](../docs/BENCHMARKS.md) for reproduction guidance.
+See the [machine-readable aggregate](reference-cpu-gpu-2026-11-06.json) and
+[metric definitions](../docs/BENCHMARKS.md#workload-and-metrics).
