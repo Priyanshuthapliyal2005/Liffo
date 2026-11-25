@@ -10,6 +10,14 @@ Use Liffo on loopback or a trusted network. External traffic needs TLS, client
 authentication, and connection limits at the edge. See the
 [deployment policy](SECURITY.md).
 
+## Architecture
+
+```mermaid
+flowchart LR
+    Client["OpenAI-compatible client"] <-->|HTTP and SSE| Liffo["Liffo · admission and routing"]
+    Liffo <-->|HTTP and SSE| Workers["llama-server workers"]
+```
+
 ## Quickstart
 
 Use Go 1.27.4, `llama-server`, and a GGUF model. In the first terminal, start a
@@ -45,7 +53,8 @@ The quickstart measures requests through Liffo. The
 [CPU and NVIDIA L4 reference report](reports/reference-cpu-gpu-2026-11-06.md)
 compares direct `llama-server` runs, so its latency and throughput figures
 exclude Liffo. It shows how concurrency changed time to first token,
-per-request decode rate, and total output for the same model and workload.
+per-request decode rate, and aggregate output throughput for the same model
+and workload.
 
 ## Documentation
 

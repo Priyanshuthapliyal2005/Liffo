@@ -5,14 +5,14 @@ directly to CPU and CUDA `llama-server` on the same Camber allocation. Liffo
 was outside the request path. Each backend completed 128 measured requests
 with zero request or SSE parse errors.
 
-Higher concurrency traded individual speed for total output on the L4.
-From concurrency 4 to 8, wall output rose from 565.2 to 673.3 tokens/s
-while median per-request decode fell from 207.5 to 124.8 tokens/s. CPU wall
-output peaked at concurrency 4 and fell at 8.
+Doubling concurrency from 4 to 8 on the L4 raised aggregate output throughput
+from 565.2 to 673.3 tokens/s, while the median per-request decode rate fell
+from 207.5 to 124.8 tokens/s. CPU aggregate output throughput peaked at
+concurrency 4 and fell at 8.
 
-![Median time to first token by concurrency for direct CPU and NVIDIA L4 runs](../docs/images/ttft-by-concurrency.svg)
+![Direct-backend median time to first token by concurrency, CPU and NVIDIA L4](../docs/images/ttft-by-concurrency.svg)
 
-![Median per-request decode rate and total output rate by concurrency for direct CPU and NVIDIA L4 runs](../docs/images/decode-throughput.svg)
+![Direct-backend per-request decode rate and aggregate output throughput by concurrency, CPU and NVIDIA L4](../docs/images/decode-throughput.svg)
 
 These results cover one model, workload, and hardware allocation. They
 do not measure gateway overhead, routing, or overload behavior.
@@ -37,14 +37,14 @@ The worker runs were sequential. The retained prompt hashes match the
 
 ## Overall
 
-| Mode | N | Errors | TTFT p50 | Latency p50 | Decode p50 | RAM max | VRAM max | GPU util max |
+| Mode | N | Errors | TTFT p50 | Latency p50 | Per-request decode rate p50 | RAM max | VRAM max | GPU util max |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | CPU | 128 | 0 | 48.8 ms | 1,619.0 ms | 29.7 tok/s | 694 MiB | 0 MiB | 0% |
 | GPU | 128 | 0 | 9.0 ms | 180.7 ms | 264.0 tok/s | 526 MiB | 734 MiB | 88% |
 
 ## By concurrency
 
-| Mode | Concurrency | TTFT p50 | Latency p50 | Per-request decode p50 | Wall output rate |
+| Mode | Concurrency | TTFT p50 | Latency p50 | Per-request decode rate p50 | Aggregate output throughput |
 |---|---:|---:|---:|---:|---:|
 | CPU | 1 | 21.2 ms | 1,031.8 ms | 55.1 tok/s | 49.4 tok/s |
 | CPU | 2 | 36.3 ms | 1,652.7 ms | 33.7 tok/s | 58.9 tok/s |

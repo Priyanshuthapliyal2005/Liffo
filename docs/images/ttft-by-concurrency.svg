@@ -10,7 +10,7 @@
   </style>
   <rect width="720" height="298" fill="#fff"/>
     <text x="32" y="36" class="title" text-anchor="start">Time to first token</text>
-    <text x="32" y="63" class="meta" text-anchor="start">Direct to llama-server · Qwen2.5-0.5B Q4_K_M</text>
+    <text x="32" y="63" class="meta" text-anchor="start">Direct-backend · llama-server · Qwen2.5-0.5B Q4_K_M</text>
     <circle cx="469" cy="59" r="5" fill="#344b6e"/>
     <text x="482" y="64" class="meta" text-anchor="start">CPU</text>
     <path d="M542,53 l6,6 -6,6 -6,-6 z" fill="#087568"/>

@@ -18,8 +18,8 @@ warmed up with 3, 2, 4 and 8 requests, respectively.
 - **Per-request decode rate** is `(output tokens − 1) / (latency − TTFT)` when
   the token count and timings permit it, with a fallback to tokens divided by
   latency. Time in these denominators is in seconds.
-- **Wall output rate** is the sum of successful output tokens divided by the
-  measured cell's elapsed wall time, excluding warmup.
+- **Aggregate output throughput** is the total number of tokens from successful
+  requests divided by the cell’s elapsed wall time, excluding warmup.
 - **Sampled maxima** reflect the resource samples taken during the run. Check
   the server log for layer placement.
 
@@ -79,8 +79,8 @@ and client executable digest are unavailable. The historical config specified
 64 output tokens at temperature zero. Retained rows agree with the token cap
 and omit the effective request parameters.
 
-Estimate wall output for a new run by dividing the sum of successful
-requests’ JSONL `tokens_out` by the rounded `wall` seconds printed by `bench`. The report uses request rows
+Estimate aggregate output throughput for a new run by summing `tokens_out` in
+successful JSONL rows and dividing by the rounded `wall` seconds printed by `bench`. The report uses request rows
 only. The reference aggregate uses the historical cell durations at full
 precision. InferMesh also sampled resources across the entire measured phase,
 so its maxima may differ from those sampled by the current Liffo client.

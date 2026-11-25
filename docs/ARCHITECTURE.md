@@ -19,12 +19,13 @@ flowchart LR
 
 A request waiting for admission holds no worker reservation. Policy-based
 selection and reservation are atomic so concurrent routing decisions account
-for work already assigned. The reservation is a gateway load signal. The
-worker manages its own inference slots.
+for work already assigned. The reservation counts toward the worker’s in-flight load. The worker
+manages its own inference slots.
 
 A readiness lease protects a managed model from eviction while a request
 is running. Liffo rolls back the worker reservation if it cannot acquire the
-lease. During a drain, existing requests can finish and new leases are refused.
+lease. During a drain, Liffo refuses new leases and lets in-flight requests
+finish.
 The managed CLI starts one local `llama-server` for an allowlisted model ID
 and waits for it to become healthy. The model file must resolve under
 `model_root`. See the [managed-worker setup](REAL_INFERENCE.md#managed-worker).
@@ -53,6 +54,16 @@ reserves a worker.
 The workload estimate uses a latency prior or a moving average of time to
 first token. The two capacity-normalized policies break ties by worker ID.
 Prefix affinity is a routing hint. Cache reuse depends on the worker.
+
+## Source packages
+
+- [`cmd/liffo`](../cmd/liffo) wires the gateway and benchmark commands.
+- [`internal/adapt`](../internal/adapt) handles HTTP and admission.
+  [`internal/route`](../internal/route) selects workers, and
+  [`internal/modellife`](../internal/modellife) manages model lifecycle.
+- [`internal/client`](../internal/client), [`internal/metrics`](../internal/metrics)
+  and [`internal/report`](../internal/report) run and report benchmarks.
+  [`internal/obs`](../internal/obs) records gateway telemetry.
 
 ## Limits
 

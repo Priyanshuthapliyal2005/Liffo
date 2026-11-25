@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 490" width="720" height="490" role="img" aria-labelledby="title desc">
-  <title id="title">Decode rate and wall output</title>
-  <desc id="desc">Direct-backend results at concurrency 1, 2, 4 and 8. The upper panel shows per-request median decode rate falling with concurrency. The lower panel shows total output rate rising on the NVIDIA L4 while CPU output peaks at concurrency four.</desc>
+  <title id="title">Decode rate and aggregate output throughput</title>
+  <desc id="desc">Direct-backend results at concurrency 1, 2, 4 and 8. The upper panel shows median per-request decode rate falling with concurrency. The lower panel shows aggregate output throughput rising on the NVIDIA L4 while CPU throughput peaks at concurrency four.</desc>
   <style>
     text { font-family: system-ui, sans-serif; fill: #17263b; }
     .title { font-size: 25px; font-weight: 700; }
@@ -9,13 +9,13 @@
     .grid { fill: none; stroke: #d6dee8; }
   </style>
   <rect width="720" height="490" fill="#fff"/>
-    <text x="32" y="36" class="title" text-anchor="start">Decode rate and wall output</text>
-    <text x="32" y="63" class="meta" text-anchor="start">Direct to llama-server · Qwen2.5-0.5B Q4_K_M</text>
+    <text x="32" y="36" class="title" text-anchor="start">Decode rate and aggregate output throughput</text>
+    <text x="32" y="63" class="meta" text-anchor="start">Direct-backend · llama-server · Qwen2.5-0.5B Q4_K_M</text>
     <circle cx="469" cy="59" r="5" fill="#344b6e"/>
     <text x="482" y="64" class="meta" text-anchor="start">CPU</text>
     <path d="M542,53 l6,6 -6,6 -6,-6 z" fill="#087568"/>
     <text x="555" y="64" class="meta" text-anchor="start">NVIDIA L4</text>
-    <text x="32" y="96" class="panel" text-anchor="start">Median decode per request (tokens/s)</text>
+    <text x="32" y="96" class="panel" text-anchor="start">Median per-request decode rate (tokens/s)</text>
     <path d="M78 240.0 H654" class="grid"/>
     <text x="68" y="245.0" class="axis" text-anchor="end">0</text>
     <path d="M78 208.75 H654" class="grid"/>
@@ -40,7 +40,7 @@
     <path d="M284,134.78 l6,6 -6,6 -6,-6 z" fill="#087568"/>
     <path d="M449,169.16 l6,6 -6,6 -6,-6 z" fill="#087568"/>
     <path d="M614,195.0 l6,6 -6,6 -6,-6 z" fill="#087568"/>
-    <text x="32" y="292" class="panel" text-anchor="start">Wall output across all requests (tokens/s)</text>
+    <text x="32" y="292" class="panel" text-anchor="start">Aggregate output throughput (tokens/s)</text>
     <path d="M78 436.0 H654" class="grid"/>
     <text x="68" y="441.0" class="axis" text-anchor="end">0</text>
     <path d="M78 404.75 H654" class="grid"/>
