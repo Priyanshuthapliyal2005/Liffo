@@ -1,19 +1,17 @@
 # Direct-backend benchmark
 
-The [November 2026 reference report](../reports/reference-cpu-gpu-2026-11-06.md)
-records CPU and NVIDIA L4 inference from the benchmark client directly to two
-`llama-server` processes. Use the [gateway smoke run](REAL_INFERENCE.md) to
-exercise Liffo's HTTP path.
+The [November 2026 reference run](../reports/reference-cpu-gpu-2026-11-06.md)
+used the CPU and CUDA `llama-server` endpoints directly. The
+[gateway quickstart](../README.md#quickstart) uses `liffo bench` with a gateway endpoint to exercise request forwarding. Its timings
+include that additional hop.
 
 ## Workload and metrics
 
 The [reference config](../configs/bench-reference.yaml) contains the three
-synthetic prompts whose hashes match all retained request rows. Each cell cycles
-through them for 32 measured streaming requests, 11 short, 11 explanatory and
-10 code requests. At concurrency 1, 2, 4 and 8, the warmup counts are 3, 2, 4 and
-8, respectively. The historical config specifies a 64-token output limit and
-temperature zero. The retained rows agree with that limit but do not record the
-effective request parameters.
+synthetic prompts used in the reference run, verified against the retained
+request hashes. Each cell has 32 measured streaming requests: 11 short,
+11 explanatory, and 10 code requests. At concurrency 1, 2, 4 and 8, the run
+warmed up with 3, 2, 4 and 8 requests, respectively.
 
 - **TTFT** measures time from client request start to the first nonempty
   streamed content delta. Latency measures the full request.
@@ -47,10 +45,8 @@ llama-server -m "$MODEL" --alias qwen --host 127.0.0.1 --port 18081 \
   -t 8 -c 8192 -np 8 -ngl 999 --metrics -v
 ```
 
-The commands reconstruct the recorded settings. The original full command
-lines and benchmark executable digest were not retained. Stop the CPU process
-before starting the GPU run. For the GPU run confirm `offloaded 25/25 layers to GPU`
-in the server log.
+Stop the CPU process before starting the GPU run. Confirm
+`offloaded 25/25 layers to GPU` in the GPU server log.
 
 From the Liffo checkout, set `mode=gpu port=18081` for the GPU matrix:
 
@@ -73,11 +69,18 @@ for concurrency in 1 2 4 8; do
 done
 ```
 
-`--mode` labels the run and controls GPU sampling. The worker launch controls
-offload. Pass `--server-pid` to sample the worker's memory. The report command
-reads request rows and does not have the cell's elapsed time. To estimate the
-wall output rate for a new run, sum successful `tokens_out` from JSONL and
-divide by the rounded `wall` value from `bench` stdout in seconds. The curated
-reference uses the historical elapsed time at its original precision.
-The historical InferMesh client also sampled resources across the measured
-phase. Resource maxima from the current Liffo client may differ in coverage.
+`--mode` labels the run and controls GPU sampling. Use the worker launch flags
+to set offload. Pass `--server-pid` to sample worker memory.
+
+## Reproduction limits
+
+The recipe reconstructs the retained settings. The original full command lines
+and client executable digest are unavailable. The historical config specified
+64 output tokens at temperature zero. Retained rows agree with the token cap
+and omit the effective request parameters.
+
+Estimate wall output for a new run by dividing the sum of successful
+requests’ JSONL `tokens_out` by the rounded `wall` seconds printed by `bench`. The report uses request rows
+only. The reference aggregate uses the historical cell durations at full
+precision. InferMesh also sampled resources across the entire measured phase,
+so its maxima may differ from those sampled by the current Liffo client.

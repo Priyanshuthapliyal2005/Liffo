@@ -1,48 +1,42 @@
 # Architecture
 
-Liffo admits and routes requests to OpenAI-compatible workers. The worker owns
-model execution and token batching.
+Liffo controls how requests reach workers. The workers load models, batch
+tokens, and generate output.
 
 ## HTTP request path
 
 ```mermaid
 flowchart LR
-    C[HTTP client] --> V[Validate request]
-    V --> A{Admission available?}
-    A -->|no| R[Reject]
-    A -->|yes| S[Select and reserve worker]
-    S --> L[Acquire lifecycle lease if configured]
-    L -->|failed| X[Release reservation and reject]
-    L -->|ready| W[Send completion request to worker]
-    W --> C
+    Client[HTTP client] --> Admit{Liffo admission}
+    Admit -->|Queue full or deadline expires| Reject[Reject request]
+    Admit -->|Slot acquired| Select[Select and reserve worker]
+    Select --> Lease{Readiness lease}
+    Lease -->|Lease fails| Release[Release reservation and reject]
+    Lease -->|Lease held or unmanaged| Worker[Inference worker]
+    Worker -->|SSE| Stream[Stream through Liffo]
+    Stream --> Client
 ```
 
-The handler validates the request and checks model eligibility where a lifecycle
-coordinator is configured. It takes an admission slot before reserving a worker.
-Normal policy selection and reservation are atomic, so subsequent routing decisions
-can see the reservation in the worker's in-flight count. The reservation is
-accounting for load, and the gateway admission cap bounds total active work.
-The admission queue has its own waiter limit. Deployments must bound connections
-and HTTP handlers at the edge.
+A request waiting for admission holds no worker reservation. Policy-based
+selection and reservation are atomic so concurrent routing decisions account
+for work already assigned. The reservation is a gateway load signal. The
+worker manages its own inference slots.
 
-After reserving the selected worker, HTTP takes any required readiness lease.
-A failed lease acquisition rolls back the reservation. Successful requests hold
-the lease through the upstream operation. The gateway releases its accounting
-on completion, error, or cancellation.
+A readiness lease protects a managed model from eviction while a request
+is running. Liffo rolls back the worker reservation if it cannot acquire the
+lease. During a drain, existing requests can finish and new leases are refused.
+The managed CLI starts one local `llama-server` for an allowlisted model ID
+and waits for it to become healthy. The model file must resolve under
+`model_root`. See the [managed-worker setup](REAL_INFERENCE.md#managed-worker).
 
-The HTTP handler makes one upstream completion attempt. It streams SSE and
-propagates cancellation. A truncated upstream stream can mark a worker unhealthy,
-allowing a later request to use a healthy peer. `Gateway.Handle` is a separate
-in-process entry point. It uses the same admission mechanism, acquires its lease
-before the executor reserves a worker, and can retry eligible failures before
-the first visible content. The `retry_enabled` setting applies to that executor.
+## Stream failures
 
-## Model lifecycle
-
-The managed CLI starts one local `llama-server` from an allowlisted logical model
-ID. The resolved path must stay under `model_root`. Loading waits for worker
-health before marking the model ready. Draining stops new leases and waits for
-existing work before eviction. See the [managed-worker setup](REAL_INFERENCE.md#managed-worker).
+The HTTP gateway makes one completion attempt. Client cancellation propagates
+upstream, and an incomplete upstream stream can mark the worker unhealthy for
+later requests. The internal Go executor used by `Gateway.Handle` can retry
+eligible failures before the first user-visible content when `retry_enabled`
+is set. In that path, a configured lease is acquired before the executor
+reserves a worker.
 
 ## Routing
 
@@ -56,11 +50,12 @@ existing work before eviction. See the [managed-worker setup](REAL_INFERENCE.md#
 | Shortest estimated workload | In-flight count times estimated service time, divided by capacity |
 | Multi-SLO | Configured cost and quality plus observed or estimated latency and load |
 
-The workload estimate uses a worker latency prior or TTFT moving average.
-The two capacity-normalized policies break equal scores by worker ID.
-Affinity is a routing hint. The worker determines whether a cached prefix can be reused.
+The workload estimate uses a latency prior or a moving average of time to
+first token. The two capacity-normalized policies break ties by worker ID.
+Prefix affinity is a routing hint. Cache reuse depends on the worker.
 
-The gateway lives in `internal/adapt`, routing in `internal/route`, lifecycle in
-`internal/modellife`, and telemetry in `internal/obs`. The benchmark client and
-reports live in `internal/client`, `internal/metrics`, and `internal/report`.
-See the [deployment boundary](../SECURITY.md) and [validation commands](VALIDATION.md).
+## Limits
+
+The admission bound covers active requests and queue waiters. Bound accepted
+connections and HTTP handlers separately at the edge. See the
+[deployment policy](../SECURITY.md) and [validation](VALIDATION.md).

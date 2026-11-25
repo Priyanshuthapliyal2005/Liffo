@@ -1,58 +1,69 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="720" height="480" viewBox="0 0 720 480" role="img" aria-labelledby="title desc">
-  <title id="title">Median per-request decode throughput by concurrency</title>
-  <desc id="desc">Grouped bar chart comparing CPU and NVIDIA L4 GPU tokens per second at concurrency 1, 2, 4, and 8. GPU throughput is higher at every tested concurrency.</desc>
-  <rect width="720" height="480" rx="18" fill="#ffffff"/>
-  <text x="40" y="42" fill="#0f172a" font-family="system-ui, sans-serif" font-size="22" font-weight="700">Median decode throughput</text>
-  <text x="40" y="69" fill="#475569" font-family="system-ui, sans-serif" font-size="13">Per-request output tokens/second · higher is better</text>
-
-  <g stroke="#e2e8f0" stroke-width="1">
-    <line x1="70" y1="100" x2="690" y2="100"/>
-    <line x1="70" y1="167.5" x2="690" y2="167.5"/>
-    <line x1="70" y1="235" x2="690" y2="235"/>
-    <line x1="70" y1="302.5" x2="690" y2="302.5"/>
-    <line x1="70" y1="370" x2="690" y2="370"/>
-  </g>
-  <g fill="#64748b" font-family="system-ui, sans-serif" font-size="12" text-anchor="end">
-    <text x="60" y="104">400</text>
-    <text x="60" y="171.5">300</text>
-    <text x="60" y="239">200</text>
-    <text x="60" y="306.5">100</text>
-    <text x="60" y="374">0</text>
-  </g>
-
-  <g fill="#64748b">
-    <rect x="110" y="332.8" width="34" height="37.2" rx="4"/>
-    <rect x="265" y="347.3" width="34" height="22.7" rx="4"/>
-    <rect x="420" y="358.9" width="34" height="11.1" rx="4"/>
-    <rect x="575" y="366.4" width="34" height="3.6" rx="2"/>
-  </g>
-  <g fill="#2563eb">
-    <rect x="152" y="126.8" width="34" height="243.2" rx="4"/>
-    <rect x="307" y="155.7" width="34" height="214.3" rx="4"/>
-    <rect x="462" y="229.9" width="34" height="140.1" rx="4"/>
-    <rect x="617" y="285.8" width="34" height="84.2" rx="4"/>
-  </g>
-
-  <g fill="#334155" font-family="system-ui, sans-serif" font-size="11" text-anchor="middle">
-    <text x="127" y="326">55.1</text>
-    <text x="282" y="340">33.7</text>
-    <text x="437" y="352">16.5</text>
-    <text x="592" y="359">5.4</text>
-    <text x="169" y="120">360.3</text>
-    <text x="324" y="149">317.5</text>
-    <text x="479" y="223">207.5</text>
-    <text x="634" y="279">124.8</text>
-  </g>
-  <g fill="#0f172a" font-family="system-ui, sans-serif" font-size="13" text-anchor="middle">
-    <text x="148" y="398">c=1</text>
-    <text x="303" y="398">c=2</text>
-    <text x="458" y="398">c=4</text>
-    <text x="613" y="398">c=8</text>
-  </g>
-  <text x="380" y="428" fill="#475569" font-family="system-ui, sans-serif" font-size="12" text-anchor="middle">Concurrent requests</text>
-
-  <rect x="226" y="445" width="13" height="13" rx="3" fill="#64748b"/>
-  <text x="246" y="456" fill="#334155" font-family="system-ui, sans-serif" font-size="12">CPU (-ngl 0)</text>
-  <rect x="372" y="445" width="13" height="13" rx="3" fill="#2563eb"/>
-  <text x="392" y="456" fill="#334155" font-family="system-ui, sans-serif" font-size="12">NVIDIA L4</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 490" width="720" height="490" role="img" aria-labelledby="title desc">
+  <title id="title">Decode rate and wall output</title>
+  <desc id="desc">Direct-backend results at concurrency 1, 2, 4 and 8. The upper panel shows per-request median decode rate falling with concurrency. The lower panel shows total output rate rising on the NVIDIA L4 while CPU output peaks at concurrency four.</desc>
+  <style>
+    text { font-family: system-ui, sans-serif; fill: #17263b; }
+    .title { font-size: 25px; font-weight: 700; }
+    .panel { font-size: 17px; font-weight: 650; }
+    .axis, .meta { font-size: 15px; fill: #42536a; }
+    .grid { fill: none; stroke: #d6dee8; }
+  </style>
+  <rect width="720" height="490" fill="#fff"/>
+    <text x="32" y="36" class="title" text-anchor="start">Decode rate and wall output</text>
+    <text x="32" y="63" class="meta" text-anchor="start">Direct to llama-server · Qwen2.5-0.5B Q4_K_M</text>
+    <circle cx="469" cy="59" r="5" fill="#344b6e"/>
+    <text x="482" y="64" class="meta" text-anchor="start">CPU</text>
+    <path d="M542,53 l6,6 -6,6 -6,-6 z" fill="#087568"/>
+    <text x="555" y="64" class="meta" text-anchor="start">NVIDIA L4</text>
+    <text x="32" y="96" class="panel" text-anchor="start">Median decode per request (tokens/s)</text>
+    <path d="M78 240.0 H654" class="grid"/>
+    <text x="68" y="245.0" class="axis" text-anchor="end">0</text>
+    <path d="M78 208.75 H654" class="grid"/>
+    <text x="68" y="213.75" class="axis" text-anchor="end">100</text>
+    <path d="M78 177.5 H654" class="grid"/>
+    <text x="68" y="182.5" class="axis" text-anchor="end">200</text>
+    <path d="M78 146.25 H654" class="grid"/>
+    <text x="68" y="151.25" class="axis" text-anchor="end">300</text>
+    <path d="M78 115.0 H654" class="grid"/>
+    <text x="68" y="120.0" class="axis" text-anchor="end">400</text>
+    <text x="119" y="261" class="axis" text-anchor="middle">1</text>
+    <text x="284" y="261" class="axis" text-anchor="middle">2</text>
+    <text x="449" y="261" class="axis" text-anchor="middle">4</text>
+    <text x="614" y="261" class="axis" text-anchor="middle">8</text>
+    <polyline points="119,222.78 284,229.47 449,234.84 614,238.31" fill="none" stroke="#344b6e" stroke-width="2.6"/>
+    <circle cx="119" cy="222.78" r="5" fill="#344b6e"/>
+    <circle cx="284" cy="229.47" r="5" fill="#344b6e"/>
+    <circle cx="449" cy="234.84" r="5" fill="#344b6e"/>
+    <circle cx="614" cy="238.31" r="5" fill="#344b6e"/>
+    <polyline points="119,127.41 284,140.78 449,175.16 614,201.0" fill="none" stroke="#087568" stroke-width="2.6" stroke-dasharray="7 5"/>
+    <path d="M119,121.41 l6,6 -6,6 -6,-6 z" fill="#087568"/>
+    <path d="M284,134.78 l6,6 -6,6 -6,-6 z" fill="#087568"/>
+    <path d="M449,169.16 l6,6 -6,6 -6,-6 z" fill="#087568"/>
+    <path d="M614,195.0 l6,6 -6,6 -6,-6 z" fill="#087568"/>
+    <text x="32" y="292" class="panel" text-anchor="start">Wall output across all requests (tokens/s)</text>
+    <path d="M78 436.0 H654" class="grid"/>
+    <text x="68" y="441.0" class="axis" text-anchor="end">0</text>
+    <path d="M78 404.75 H654" class="grid"/>
+    <text x="68" y="409.75" class="axis" text-anchor="end">175</text>
+    <path d="M78 373.5 H654" class="grid"/>
+    <text x="68" y="378.5" class="axis" text-anchor="end">350</text>
+    <path d="M78 342.25 H654" class="grid"/>
+    <text x="68" y="347.25" class="axis" text-anchor="end">525</text>
+    <path d="M78 311.0 H654" class="grid"/>
+    <text x="68" y="316.0" class="axis" text-anchor="end">700</text>
+    <text x="119" y="457" class="axis" text-anchor="middle">1</text>
+    <text x="284" y="457" class="axis" text-anchor="middle">2</text>
+    <text x="449" y="457" class="axis" text-anchor="middle">4</text>
+    <text x="614" y="457" class="axis" text-anchor="middle">8</text>
+    <polyline points="119,427.18 284,425.48 449,425.34 614,428.79" fill="none" stroke="#344b6e" stroke-width="2.6"/>
+    <circle cx="119" cy="427.18" r="5" fill="#344b6e"/>
+    <circle cx="284" cy="425.48" r="5" fill="#344b6e"/>
+    <circle cx="449" cy="425.34" r="5" fill="#344b6e"/>
+    <circle cx="614" cy="428.79" r="5" fill="#344b6e"/>
+    <polyline points="119,396.62 284,365.25 449,335.07 614,315.77" fill="none" stroke="#087568" stroke-width="2.6" stroke-dasharray="7 5"/>
+    <path d="M119,390.62 l6,6 -6,6 -6,-6 z" fill="#087568"/>
+    <path d="M284,359.25 l6,6 -6,6 -6,-6 z" fill="#087568"/>
+    <path d="M449,329.07 l6,6 -6,6 -6,-6 z" fill="#087568"/>
+    <path d="M614,309.77 l6,6 -6,6 -6,-6 z" fill="#087568"/>
+    <text x="366" y="476" class="meta" text-anchor="middle">Concurrent requests</text>
 </svg>

@@ -1,11 +1,14 @@
 # Liffo
 
-Liffo is a Go gateway for OpenAI-compatible inference workers. It bounds
-admission, routes requests across workers, streams responses, and can manage
-one local `llama-server` process. The reference backend is llama.cpp.
+Liffo is a Go gateway for running local inference across OpenAI-compatible
+workers. A slow or draining worker can tie up requests that another worker
+could serve. Liffo bounds active and waiting requests, routes new work using
+worker load and health, and streams the response back to the client.
+`llama-server` is the reference backend.
 
-Run Liffo on loopback or a trusted network. Use an authenticated TLS proxy
-and connection limits for external traffic. See the [deployment policy](SECURITY.md).
+Use Liffo on loopback or a trusted network. External traffic needs TLS, client
+authentication, and connection limits at the edge. See the
+[deployment policy](SECURITY.md).
 
 ## Quickstart
 
@@ -36,12 +39,13 @@ Look for `n=10 errors=0` in the benchmark output. Stop both processes with
 Ctrl-C when finished. See the [run guide](docs/REAL_INFERENCE.md) for managed
 workers and GPU checks.
 
-## Reference benchmark
+## Measurements
 
-The [CPU and NVIDIA L4 report](reports/reference-cpu-gpu-2026-11-06.md) measures
-one Qwen2.5-0.5B-Instruct Q4_K_M model directly against llama.cpp. The
-[benchmark guide](docs/BENCHMARKS.md) describes the workload and how to repeat
-the setup.
+The quickstart measures requests through Liffo. The
+[CPU and NVIDIA L4 reference report](reports/reference-cpu-gpu-2026-11-06.md)
+compares direct `llama-server` runs, so its latency and throughput figures
+exclude Liffo. It shows how concurrency changed time to first token,
+per-request decode rate, and total output for the same model and workload.
 
 ## Documentation
 

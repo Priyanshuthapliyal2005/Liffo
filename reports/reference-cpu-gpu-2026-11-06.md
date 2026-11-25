@@ -1,8 +1,21 @@
 # CPU and NVIDIA L4 reference run
 
 On November 6, 2026 UTC, the InferMesh benchmark client sent streaming requests
-directly to CPU and CUDA `llama-server` on one Camber allocation. There were
-128 measured requests per mode, with zero request and SSE parse errors.
+directly to CPU and CUDA `llama-server` on the same Camber allocation. Liffo
+was outside the request path. Each backend completed 128 measured requests
+with zero request or SSE parse errors.
+
+Higher concurrency traded individual speed for total output on the L4.
+From concurrency 4 to 8, wall output rose from 565.2 to 673.3 tokens/s
+while median per-request decode fell from 207.5 to 124.8 tokens/s. CPU wall
+output peaked at concurrency 4 and fell at 8.
+
+![Median time to first token by concurrency for direct CPU and NVIDIA L4 runs](../docs/images/ttft-by-concurrency.svg)
+
+![Median per-request decode rate and total output rate by concurrency for direct CPU and NVIDIA L4 runs](../docs/images/decode-throughput.svg)
+
+These results cover one model, workload, and hardware allocation. They
+do not measure gateway overhead, routing, or overload behavior.
 
 ## Environment and workload
 
@@ -42,10 +55,6 @@ The worker runs were sequential. The retained prompt hashes match the
 | GPU | 4 | 11.1 ms | 299.3 ms | 207.5 tok/s | 565.2 tok/s |
 | GPU | 8 | 16.9 ms | 455.5 ms | 124.8 tok/s | 673.3 tok/s |
 
-![Median decode throughput by concurrency](../docs/images/decode-throughput.svg)
-
-![Median TTFT by concurrency](../docs/images/ttft-by-concurrency.svg)
-
 ## GPU placement
 
 The inference-server log recorded:
@@ -55,13 +64,6 @@ offloaded 25/25 layers to GPU
 CUDA0 model buffer size = 373.73 MiB
 CUDA0 KV buffer size = 96.00 MiB
 ```
-
-## Interpretation
-
-The GPU run had lower median TTFT and higher median decode rate in each cell.
-CPU wall output peaked at concurrency 4 and fell at 8. GPU wall output
-continued to rise at 8 while per-request decode fell. The run covers one model,
-workload and allocation.
 
 See the [machine-readable aggregate](reference-cpu-gpu-2026-11-06.json) and
 [metric definitions](../docs/BENCHMARKS.md#workload-and-metrics).
