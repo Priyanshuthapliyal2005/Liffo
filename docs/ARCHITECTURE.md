@@ -1,117 +1,72 @@
 # Architecture
 
-> Liffo is the reliability layer between an OpenAI-compatible client and one
-> or more inference workers.
+Liffo controls how requests reach workers. The workers load models, batch
+tokens, and generate output.
 
-[Documentation](README.md) · [Run it](REAL_INFERENCE.md) · [Benchmarks](BENCHMARKS.md)
-
----
-
-## The design in one picture
+## HTTP request path
 
 ```mermaid
 flowchart LR
-    Client[Client] --> HTTP[HTTP boundary]
-    HTTP --> Admit{Admission capacity?}
-    Admit -->|no| Reject[Overload response]
-    Admit -->|yes| Lease[Readiness lease]
-    Lease --> Route[Select + reserve atomically]
-    Route --> Worker[Inference worker]
-    Worker --> Stream[Stream SSE]
+    Client[HTTP client] --> Admit{Liffo admission}
+    Admit -->|Queue full or deadline expires| Reject[Reject request]
+    Admit -->|Slot acquired| Select[Select and reserve worker]
+    Select --> Lease{Readiness lease}
+    Lease -->|Lease fails| Release[Release reservation and reject]
+    Lease -->|Lease held or unmanaged| Worker[Inference worker]
+    Worker -->|SSE| Stream[Stream through Liffo]
     Stream --> Client
-    Worker -. failure before output .-> Retry{Safe to retry?}
-    Retry -->|yes| Route
-    Retry -->|no / output visible| Stream
-    HTTP -.-> Obs[Metrics + traces]
-    Worker -.-> Obs
 ```
 
-The important ordering is **admit → lease → select and reserve → stream**.
-Changing that sequence can leak capacity, route to draining models, or let an
-unbounded number of requests wait inside the gateway.
+A request waiting for admission holds no worker reservation. Policy-based
+selection and reservation are atomic so concurrent routing decisions account
+for work already assigned. The reservation counts toward the worker’s in-flight load. The worker
+manages its own inference slots.
 
-## Request path
+A readiness lease protects a managed model from eviction while a request
+is running. Liffo rolls back the worker reservation if it cannot acquire the
+lease. During a drain, Liffo refuses new leases and lets in-flight requests
+finish.
+The managed CLI starts one local `llama-server` for an allowlisted model ID
+and waits for it to become healthy. The model file must resolve under
+`model_root`. See the [managed-worker setup](REAL_INFERENCE.md#managed-worker).
 
-| Stage | Responsibility | Failure behavior |
-|---|---|---|
-| HTTP boundary | Parse the OpenAI-compatible request and establish cancellation | Invalid requests fail before consuming worker capacity |
-| Bounded admission | Limit active requests and queued waiters | Excess load is rejected predictably instead of accumulating |
-| Lifecycle lease | Prevent a selected model from being evicted mid-request | Only ready models receive new work |
-| Route + reserve | Choose a worker and claim capacity as one operation | Concurrent requests cannot select the same final slot |
-| Upstream stream | Forward SSE without buffering the whole completion | Cancellation propagates to the worker |
-| Recovery | Retry only before user-visible output | A response is never silently duplicated after streaming begins |
-| Observation | Record metrics and spans | Prompt and completion bodies are not persisted |
+## Stream failures
 
-Both direct and HTTP requests enter the same admission and lifecycle sequence.
-That shared path prevents internal callers from bypassing the safety boundary.
+The HTTP gateway makes one completion attempt. Client cancellation propagates
+upstream, and an incomplete upstream stream can mark the worker unhealthy for
+later requests. The internal Go executor used by `Gateway.Handle` can retry
+eligible failures before the first user-visible content when `retry_enabled`
+is set. In that path, a configured lease is acquired before the executor
+reserves a worker.
 
-## Model lifecycle
+## Routing
 
-```mermaid
-flowchart LR
-    Stopped -->|start| Loading
-    Loading -->|health passes| Ready
-    Loading -->|start or health failure| Failed
-    Ready -->|replace or evict| Draining
-    Draining -->|leases reach zero| Evicting
-    Evicting -->|process exits| Stopped
-    Failed -->|retry| Loading
-    Failed -->|cleanup| Stopped
-```
+| Policy | Selection signal |
+| --- | --- |
+| Round robin | Rotate through available workers |
+| Least in-flight | Current in-flight count, with rotation for idle ties |
+| Prefix affinity | Worker affinity for shared prefixes |
+| Hybrid | Load, affinity, and health |
+| Capacity-normalized least in-flight | In-flight count divided by configured capacity |
+| Shortest estimated workload | In-flight count times estimated service time, divided by capacity |
+| Multi-SLO | Configured cost and quality plus observed or estimated latency and load |
 
-The local loader starts `llama-server` from an allowlisted logical model ID.
-Resolved model paths must stay beneath the configured model root. Draining
-stops new leases before process termination and waits for existing work to
-leave the critical section.
+The workload estimate uses a latency prior or a moving average of time to
+first token. The two capacity-normalized policies break ties by worker ID.
+Prefix affinity is a routing hint. Cache reuse depends on the worker.
 
-## Routing policies
+## Source packages
 
-| Policy | Optimizes for | Useful when |
-|---|---|---|
-| Round robin | Even request count | Workers have similar capacity and requests are uniform |
-| Least inflight | Current queue depth | Request costs vary moderately |
-| Prefix affinity | Cache locality | Prompts share reusable prefixes |
-| Capacity-aware | Relative worker capacity | CPU and GPU workers differ materially |
-| Estimated workload | Predicted request cost | Token budgets or prompt sizes vary widely |
-| Multi-SLO | Different latency objectives | Traffic classes need separate service targets |
-| Hybrid | Load plus locality | Neither queue depth nor cache affinity is sufficient alone |
+- [`cmd/liffo`](../cmd/liffo) wires the gateway and benchmark commands.
+- [`internal/adapt`](../internal/adapt) handles HTTP and admission.
+  [`internal/route`](../internal/route) selects workers, and
+  [`internal/modellife`](../internal/modellife) manages model lifecycle.
+- [`internal/client`](../internal/client), [`internal/metrics`](../internal/metrics)
+  and [`internal/report`](../internal/report) run and report benchmarks.
+  [`internal/obs`](../internal/obs) records gateway telemetry.
 
-Worker selection and capacity reservation are atomic. Idle ties rotate rather
-than permanently favoring the first configured worker.
+## Limits
 
-## Package map
-
-| Package | Owns |
-|---|---|
-| `internal/adapt` | Gateway, admission, adaptive control, shared request path |
-| `internal/route` | Routing policies, worker state, atomic reservation |
-| `internal/modellife` | Lifecycle state machine and process-backed loaders |
-| `internal/client` + `internal/sse` | OpenAI-compatible streaming benchmark client and SSE parsing |
-| `internal/sysmon` | RAM, VRAM, and GPU-utilization sampling |
-| `internal/metrics` + `internal/report` | Aggregate calculations and report generation |
-| `internal/obs` | Prometheus metrics and OpenTelemetry spans |
-
-## Reliability invariants
-
-1. Admission happens before worker capacity is reserved.
-2. A readiness lease covers the entire selected-worker operation.
-3. Selection and reservation are a single atomic decision.
-4. Retry stops permanently after the first user-visible output.
-5. Every accepted request releases admission, lease, and reservation exactly once.
-6. Lifecycle paths resolve models from allowlisted IDs beneath `model_root`.
-7. Benchmark output stores prompt identity, never prompt or completion bodies.
-
-These invariants are backed by regression tests, including race-enabled tests;
-see [validation evidence](VALIDATION.md).
-
-## Deliberate boundaries
-
-Liffo request admission is **not** llama.cpp continuous batching. Liffo also
-does not download models, terminate TLS, authenticate ordinary completion
-requests, or make results from different hardware comparable. Those remain
-explicit deployment responsibilities.
-
----
-
-Next: [run a real CPU/GPU workload](REAL_INFERENCE.md) or inspect the
-[reference measurements](BENCHMARKS.md).
+The admission bound covers active requests and queue waiters. Bound accepted
+connections and HTTP handlers separately at the edge. See the
+[deployment policy](../SECURITY.md) and [validation](VALIDATION.md).

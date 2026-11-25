@@ -516,7 +516,7 @@ func (h *HTTPServer) handleChatCompletions(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	attrs.Model = sess.Model
-	// Proof header: both planes enter via gateway.BeginRequest.
+	// Preserve the shared admission identifier in the response.
 	w.Header().Set("X-Liffo-Shared-Path", sess.PathID)
 
 	wLabel := h.labelOf(dec.WorkerID)
@@ -563,7 +563,7 @@ func (h *HTTPServer) handleChatCompletions(w http.ResponseWriter, r *http.Reques
 		w.Header().Set("X-Liffo-Model-State", "ready")
 		w.Header().Set("X-Liffo-Lifecycle-Hold", "1")
 	}
-	// --- Separated network vs backend TTFT ---
+	// The health probe runs before inference. RTT/2 estimates the return-path delay.
 	upStart := time.Now()
 	var timing UpstreamTiming
 	rtt, perr := probeNetworkRTT(ctx, h.client, dec.BaseURL)
@@ -887,8 +887,7 @@ func (h *HTTPServer) handleModelsLoad(w http.ResponseWriter, r *http.Request) {
 			"model_state": ms.State,
 			"inflight":    ms.Inflight,
 			"queue_depth": ms.QueueDepth,
-			// Async: drain only applies while lifecycle leases are held. Concurrent
-			// chat may still 200 if inflight==0. For drain proof use ?wait=1 with a held lease.
+			// Async acceptance can precede the transition to draining.
 			"note": "async queue; drain while leases held. Proof path: hold stream + ?wait=1",
 		})
 		return

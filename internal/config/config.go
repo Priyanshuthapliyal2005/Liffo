@@ -100,7 +100,7 @@ func (c *Config) SampleInterval() time.Duration {
 	return time.Duration(ms) * time.Millisecond
 }
 
-// ApplyRunFlags merges CLI flags for the "run" subcommand.
+// ApplyRunFlags merges CLI flags for the bench command.
 func ApplyRunFlags(cfg *Config, args []string) error {
 	fs := flag.NewFlagSet("run", flag.ContinueOnError)
 	configPath := fs.String("config", "configs/bench.yaml", "path to bench YAML")

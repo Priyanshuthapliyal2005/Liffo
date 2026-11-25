@@ -15,7 +15,7 @@ vet:
 check: test vet race build
 
 vuln:
-	go run golang.org/x/vuln/cmd/govulncheck@latest ./...
+	go run golang.org/x/vuln/cmd/govulncheck@v1.10.0 ./...
 
 clean:
 	go clean
