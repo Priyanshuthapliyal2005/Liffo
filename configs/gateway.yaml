@@ -13,6 +13,6 @@ workers:
     capacity: 1
 
 # To let Liffo start and stop llama-server, configure lifecycle as shown in
-# configs/gateway-managed.example.yaml and set LIFFO_ADMIN_TOKEN.
+# configs/gateway-managed-example.yaml and set LIFFO_ADMIN_TOKEN.
 lifecycle:
   enabled: false

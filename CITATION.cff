@@ -8,7 +8,6 @@ authors:
 repository-code: "https://github.com/Priyanshuthapliyal2005/Liffo"
 url: "https://github.com/Priyanshuthapliyal2005/Liffo"
 version: 0.1.0-rc1
-date-released: 2026-11-07
 license: Apache-2.0
 keywords:
   - llm-inference

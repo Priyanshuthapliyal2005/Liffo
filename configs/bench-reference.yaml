@@ -1,0 +1,27 @@
+base_url: http://127.0.0.1:18080
+endpoint_path: /v1/chat/completions
+model: qwen
+mode: cpu
+stream: true
+warmup: 1
+max_tokens: 64
+temperature: 0
+timeout_sec: 120
+sample_interval_ms: 200
+prompts:
+  - id: p01_short
+    messages:
+      - role: system
+        content: "You are a concise assistant. Answer in one short sentence."
+      - role: user
+        content: "What is 2+2?"
+  - id: p02_medium
+    messages:
+      - role: system
+        content: "You are a technical assistant."
+      - role: user
+        content: "Explain what TTFT means for LLM inference in two sentences."
+  - id: p03_code
+    messages:
+      - role: user
+        content: "Write a Go function that returns the sum of two integers. Code only."
